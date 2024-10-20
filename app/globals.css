@@ -2,6 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
+@import url("../public/build/kohaku.css");
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
