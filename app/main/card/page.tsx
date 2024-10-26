@@ -1,31 +1,51 @@
 "use client";
 
+import { createNote } from "@/app/lib/anki";
 import { ExtendedFormData } from "@/app/lib/form";
 import { Store } from "@/app/store";
+import type { TranslationResult } from "google-translate-api-browser/dest/types/TranslationResult";
 import { ChevronLeft } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { debounce } from "radash";
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 
 export default function Card() {
   const frontInput = useRef<HTMLKhkTextfieldElement>();
   const backInput = useRef<HTMLKhkTextfieldElement>();
-  const submitButton = useRef<HTMLKhkButtonElement>();
 
-  let oldFront: string = "";
-  let oldBack: string = "";
+  const oldFront = useRef<string>("");
+  const oldBack = useRef<string>("");
+  const currentTranslation = useRef<TranslationResult>();
+
+  const [isButtonDisabled, setButtonDisabledState] = useState<
+    boolean | undefined
+  >(true);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    const formData = new ExtendedFormData(event.target as HTMLFormElement);
+    const form = event.target as HTMLFormElement;
+    const formData = new ExtendedFormData(form);
+    const front = formData.get("front");
+    const back = formData.get("back");
+    const sample = formData.get("sample");
 
-    console.log("logger ici", formData.json());
-
-    for (const p of formData) {
-      console.log(`logger `, p);
+    if (!front || !back) {
+      return;
     }
+
+    const noteId = await createNote(front.toString(), back.toString(), {
+      sample: sample?.toString(),
+      translation: currentTranslation.current,
+    });
+
+    if (!noteId) {
+      return;
+    }
+
+    // Clear fields to allow for new input
+    form.reset();
   }
 
   async function handleTranslateSide(
@@ -35,9 +55,13 @@ export default function Card() {
     // If the input is empty, return
     if (!input.value) return;
     // If the input is the same as the previous one, return
-    if (input.value.trim() === (side === "front" ? oldFront : oldBack)) return;
-    if (side === "front") oldFront = input.value.trim();
-    else oldBack = input.value.trim();
+    if (
+      input.value.trim() ===
+      (side === "front" ? oldFront.current : oldBack.current)
+    )
+      return;
+    if (side === "front") oldFront.current = input.value.trim();
+    else oldBack.current = input.value.trim();
     // If the other side is not empty, return
     if (backInput.current?.value?.trim() && side === "front") return;
     if (frontInput.current?.value?.trim() && side === "back") return;
@@ -47,6 +71,7 @@ export default function Card() {
       side === "back"
     );
     if (!response?.text) return;
+    currentTranslation.current = response;
 
     if (backInput.current && side === "front")
       backInput.current.value = response.text.trim();
@@ -80,9 +105,11 @@ export default function Card() {
   }
 
   function handleFormInput(): void {
-    if (submitButton.current)
-      submitButton.current.disabled =
-        !frontInput.current?.value?.trim() || !backInput.current?.value?.trim();
+    setButtonDisabledState(
+      !frontInput.current?.value?.trim() || !backInput.current?.value?.trim()
+        ? true
+        : undefined
+    );
   }
 
   return (
@@ -136,10 +163,9 @@ export default function Card() {
 
           <khk-button
             class="mt-2"
-            ref={(button) => (submitButton.current = button)}
             full
             type="submit"
-            disabled
+            disabled={isButtonDisabled}
           >
             SAVE
           </khk-button>

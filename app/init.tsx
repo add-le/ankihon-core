@@ -2,7 +2,7 @@
 
 import "@add-le/ankihon-kohaku";
 import { useEffect } from "react";
-import { getAnkihonDeck } from "./lib/anki";
+import { getAnkihonDeck, getAnkihonModel } from "./lib/anki";
 import { getSpeech } from "./lib/speech";
 import { Store } from "./store";
 
@@ -11,7 +11,10 @@ export default function Init() {
     async function init() {
       // Fetch the ankihon deck from anki
       const ankihonDeckId = await getAnkihonDeck();
-      console.log("logger", ankihonDeckId);
+      console.log("logger ankihonDeckId", ankihonDeckId);
+      // Fetch the ankihon model from anki
+      const ankihonModelId = await getAnkihonModel();
+      console.log("logger ankihonModelId", ankihonModelId);
 
       const voices = await getSpeech();
       const japVoices = voices.filter((voice) => voice.lang === "ja-JP");

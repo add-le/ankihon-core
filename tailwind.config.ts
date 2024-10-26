@@ -1,3 +1,4 @@
+import tailwind3dTransformPlugin from "@xpd/tailwind-3dtransforms";
 import type { Config } from "tailwindcss";
 
 const config: Config = {
@@ -14,6 +15,6 @@ const config: Config = {
       },
     },
   },
-  plugins: [],
+  plugins: [tailwind3dTransformPlugin],
 };
 export default config;

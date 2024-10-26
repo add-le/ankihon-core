@@ -8,7 +8,7 @@ export default function Flashcard({
   return (
     <>
       <div
-        className={`${className} border border-zinc-700 rounded-lg h-[80dvh] w-[80dvw] md:w-[65dvw] bg-zinc-900`}
+        className={`${className} border border-zinc-700 rounded-lg h-full bg-zinc-900`}
       >
         {children}
       </div>
