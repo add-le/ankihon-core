@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
+import nextConfig from "../next.config.mjs";
 import "./globals.css";
 import Init from "./init";
 
 export const metadata: Metadata = {
-  manifest: "/manifest.json",
+  manifest: `${nextConfig.basePath}/manifest.json`,
 };
 
 export default function RootLayout({
