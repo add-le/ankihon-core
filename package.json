@@ -2,6 +2,7 @@
   "name": "ankihon-core",
   "version": "0.0.1",
   "private": true,
+  "homepage": ".",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
