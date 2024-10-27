@@ -2,7 +2,7 @@
 
 import { createNote } from "@/app/lib/anki";
 import { ExtendedFormData } from "@/app/lib/form";
-import { Store } from "@/app/store";
+import { Share } from "@/app/share";
 import type { TranslationResult } from "google-translate-api-browser/dest/types/TranslationResult";
 import { ChevronLeft } from "lucide-react";
 import Image from "next/image";
@@ -66,7 +66,7 @@ export default function Card() {
     if (backInput.current?.value?.trim() && side === "front") return;
     if (frontInput.current?.value?.trim() && side === "back") return;
 
-    const response = await Store.services.translate.translate(
+    const response = await Share.services.translate.translate(
       input.value,
       side === "back"
     );
@@ -116,7 +116,12 @@ export default function Card() {
     <div className="m-4">
       <div className="h-12 w-12">
         <Link href="/main/learn">
-          <khk-button variant="quiet" shape="circular" full>
+          <khk-button
+            variant="quiet"
+            shape="circular"
+            full
+            class="flex w-full h-full"
+          >
             <ChevronLeft />
           </khk-button>
         </Link>

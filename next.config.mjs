@@ -4,6 +4,10 @@ const __dirname = path.resolve();
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  output: "export",
+  images: {
+    unoptimized: true,
+  },
   webpack: (config) => {
     config.plugins.push(
       new CopyPlugin({

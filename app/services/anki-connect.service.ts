@@ -1,13 +1,19 @@
 import { Service } from "./service";
 
 type Actions =
+  | "addNote"
+  | "answerCards"
+  | "cardReviews"
+  | "cardsInfo"
+  | "createDeck"
+  | "createModel"
   | "deckNames"
   | "deckNamesAndIds"
-  | "createDeck"
+  | "findNotes"
+  | "getReviewsOfCards"
   | "modelNames"
   | "modelNamesAndIds"
-  | "createModel"
-  | "addNote";
+  | "notesInfo";
 type AnkiResponse<T> = { result: T; error: string | null };
 
 type DeckNamesResponse = string[];
@@ -86,6 +92,95 @@ type CreateNoteParams = {
     picture: Media[];
   };
 };
+
+type CardReviewsParams = {
+  deck: string;
+  startID: number;
+};
+
+type CardReviewsResponse = [
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+  number
+][];
+
+type GetReviewsOfCardsParams = string[];
+type GetReviewsOfCardsResponse = Record<
+  string,
+  {
+    id: string;
+    usn: number;
+    ease: number;
+    ivl: number;
+    lastIvl: number;
+    factor: number;
+    time: number;
+    type: number;
+  }[]
+>;
+
+type CardsInfoParams = number[];
+export type CardsInfoResponse<Fields extends string> = Record<
+  string,
+  {
+    answer: string;
+    question: string;
+    deckName: string;
+    modelName: string;
+    fieldOrder: number;
+    fields: Record<
+      Fields,
+      {
+        value: string;
+        order: number;
+      }
+    >;
+    css: string;
+    cardId: number;
+    interval: number;
+    note: number;
+    ord: number;
+    type: number;
+    queue: number;
+    due: number;
+    reps: number;
+    lapses: number;
+    left: number;
+    mod: number;
+  }
+>;
+
+type FindNotesParams = string;
+type FindNotesResponse = number[];
+
+type NotesInfoParams = number[];
+type NotesInfoResponse<Fields extends string> = {
+  noteId: number;
+  profile: string;
+  modelName: string;
+  tags: string[];
+  fields: Record<
+    Fields,
+    {
+      value: string;
+      order: number;
+    }
+  >;
+  mod: number;
+  cards: number[];
+}[];
+
+type AnswerCardsParams = {
+  cardId: number;
+  ease: 1 | 2 | 3 | 4;
+}[];
+type AnswerCardsResponse = boolean[];
 
 export class AnkiConnectService extends Service {
   public constructor() {
@@ -172,5 +267,75 @@ export class AnkiConnectService extends Service {
    */
   public async addNote(params: CreateNoteParams): Promise<number> {
     return this.invoke<number>("addNote", { note: params });
+  }
+
+  /**
+   * Get the reviews for a deck in the Anki collection.
+   * @param {CardReviewsParams} params The parameters for the card reviews.
+   * @returns {Promise<CardReviewsResponse>} A list of card reviews.
+   */
+  public async cardReviews(
+    params: CardReviewsParams
+  ): Promise<CardReviewsResponse> {
+    return this.invoke<CardReviewsResponse>("cardReviews", params);
+  }
+
+  /**
+   * Get the reviews for a list of cards in the Anki collection.
+   * @param {GetReviewsOfCardsParams} params The list of card IDs.
+   * @returns {Promise<GetReviewsOfCardsResponse>} A map of card IDs to card reviews.
+   */
+  public async getReviewsOfCards(
+    params: GetReviewsOfCardsParams
+  ): Promise<GetReviewsOfCardsResponse> {
+    return this.invoke<GetReviewsOfCardsResponse>("getReviewsOfCards", {
+      cards: params,
+    });
+  }
+
+  /**
+   * Get information about a list of cards in the Anki collection.
+   * @param {CardsInfoParams} params The list of card IDs.
+   * @returns {Promise<CardsInfoResponse<Fields>>} A map of card IDs to card information.
+   */
+  public async cardsInfo<Fields extends string>(
+    params: CardsInfoParams
+  ): Promise<CardsInfoResponse<Fields>> {
+    return this.invoke<CardsInfoResponse<Fields>>("cardsInfo", {
+      cards: params,
+    });
+  }
+
+  /**
+   * Find notes in the Anki collection that match a query.
+   * @param {FindNotesParams} query The query to match.
+   * @returns {Promise<FindNotesResponse>} A list of note IDs.
+   */
+  public async findNotes(query: FindNotesParams): Promise<FindNotesResponse> {
+    return this.invoke<FindNotesResponse>("findNotes", { query });
+  }
+
+  /**
+   * Get information about a list of notes in the Anki collection.
+   * @param {NotesInfoParams} params The list of note IDs.
+   * @returns {Promise<NotesInfoResponse<Fields>>} A list of note information.
+   */
+  public async notesInfo<Fields extends string>(
+    params: NotesInfoParams
+  ): Promise<NotesInfoResponse<Fields>> {
+    return this.invoke<NotesInfoResponse<Fields>>("notesInfo", {
+      notes: params,
+    });
+  }
+
+  /**
+   * Answer a list of cards in the Anki collection.
+   * @param {AnswerCardsParams} params The list of card answers.
+   * @returns {Promise<AnswerCardsResponse>} A list of boolean values indicating success.
+   */
+  public async answerCards(
+    params: AnswerCardsParams
+  ): Promise<AnswerCardsResponse> {
+    return this.invoke<AnswerCardsResponse>("answerCards", { answers: params });
   }
 }

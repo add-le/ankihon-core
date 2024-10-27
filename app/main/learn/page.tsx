@@ -1,57 +1,25 @@
 "use client";
 
-import { useRef, useState } from "react";
-import "./styles.css";
-
-import { Store } from "@/app/store";
+import { answerAnkihonCard } from "@/app/lib/anki";
+import { Share } from "@/app/share";
+import { useStore } from "@/app/store";
 import Flashcard from "@/app/ui/flashcard";
 import { Plus, Volume2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { capitalize } from "radash";
+import { useRef, useState } from "react";
+import "./styles.css";
 
 export default function Learn() {
+  const [useCardsStore, setCardsStore] = useStore();
+
   async function handleReadKanji(kanji: string): Promise<void> {
     const utterThis = new SpeechSynthesisUtterance(kanji);
-    utterThis.voice = Store.japVoices[0];
+    utterThis.voice = Share.japVoices[0];
     window.speechSynthesis.speak(utterThis);
   }
 
-  const initialCards = [
-    {
-      translation: "love",
-      kanji: "愛",
-      kana: "あい",
-      image: "https://imgs.duocards.com/flatsSvg/2913124.svg",
-    },
-    {
-      translation: "train",
-      kanji: "電車",
-      kana: "でんしゃ",
-      image: "https://imgs.duocards.com/flatsSvg/3324675.svg",
-    },
-    {
-      translation: "cat",
-      kanji: "猫",
-      kana: "ねこ",
-      image: "https://imgs.duocards.com/flatsSvg/763724.svg",
-    },
-    {
-      translation: "dog",
-      kanji: "犬",
-      kana: "いぬ",
-      image: "https://imgs.duocards.com/flatsSvg/616408.svg",
-    },
-    {
-      translation: "book",
-      kanji: "本",
-      kana: "ほん",
-      image: "https://imgs.duocards.com/flatsSvg/167755.svg",
-    },
-  ];
-
-  const [cards, setCards] = useState(initialCards);
-  const [currentIndex, setCurrentIndex] = useState(cards.length - 1);
   const [showAnswer, setShowAnswer] = useState(false);
   const [touchEnd, setTouchEnd] = useState(0);
   const [touchStart, setTouchStart] = useState(0);
@@ -67,17 +35,17 @@ export default function Learn() {
     setTouchEnd(e.targetTouches[0].clientX);
   }
 
-  function handleTouchEnd(): void {
+  function handleTouchEnd(cardId: number): void {
     if (!touchStart || !touchEnd || !showAnswer) return;
     const swipeDistance = touchStart - touchEnd;
 
     // If swipe distance is large enough, it's considered a swipe
     if (swipeDistance > 100) {
-      handleSwipe("left");
+      handleSwipe("left", cardId);
       setTransitionDuration("0s");
       setShowAnswer(false);
     } else if (swipeDistance < -100) {
-      handleSwipe("right");
+      handleSwipe("right", cardId);
       setTransitionDuration("0s");
       setShowAnswer(false);
     }
@@ -87,28 +55,44 @@ export default function Learn() {
     setTouchEnd(0);
   }
 
-  function handleSwipe(direction: "left" | "right"): void {
-    if (["left", "right"].includes(direction))
-      setCurrentIndex(currentIndex - 1);
+  async function handleSwipe(
+    direction: "left" | "right",
+    cardId: number
+  ): Promise<void> {
+    if (["left", "right"].includes(direction)) {
+      // Card is not known
+      if (direction === "left") {
+        await answerAnkihonCard(cardId, "again");
+      }
+      // Card is known
+      if (direction === "right") {
+        await answerAnkihonCard(cardId, "good");
+      }
+      // Remove the card from the deck
+      setCardsStore(useCardsStore.slice(0, -1));
+    }
   }
 
   function handleClick(): void {
     setTransitionDuration("0.6s");
-    if (!showAnswer) handleReadKanji(cards[currentIndex].kanji);
+    if (!showAnswer)
+      handleReadKanji(useCardsStore[useCardsStore.length - 1].kanji);
     setShowAnswer(true);
   }
 
   return (
     <div className="h-dvh w-dvw">
       <div className="flex justify-center h-full items-center relative">
-        {cards.map((card, index) => (
+        {useCardsStore.map((card, index) => (
           <div
-            className={`card ${index === currentIndex ? "active" : ""} h-[75%]`}
+            className={`card ${
+              index === useCardsStore.length - 1 ? "active" : ""
+            } h-[75%]`}
             key={card.translation}
             onTouchStart={handleTouchStart}
             onTouchMove={handleTouchMove}
-            onTouchEnd={handleTouchEnd}
-            ref={index === currentIndex ? cardRef : null}
+            onTouchEnd={() => handleTouchEnd(card.id)}
+            ref={index === useCardsStore.length - 1 ? cardRef : null}
           >
             <div
               className="h-full w-full perspective-1000"
@@ -122,12 +106,14 @@ export default function Learn() {
               >
                 <div className="h-full w-full absolute backface-hidden">
                   <Flashcard className="h-full w-full flex flex-col items-center justify-center">
-                    <Image
-                      width={100}
-                      height={100}
-                      alt="lost"
-                      src={card.image}
-                    />
+                    {card.image && (
+                      <Image
+                        width={100}
+                        height={100}
+                        alt="icon representing the card"
+                        src={card.image}
+                      />
+                    )}
                     <p className="font-bold text-4xl text-zinc-50">
                       {capitalize(card.translation)}
                     </p>
@@ -135,13 +121,14 @@ export default function Learn() {
                 </div>
                 <div className="h-full w-full absolute backface-hidden transform rotate-y-180">
                   <Flashcard className="h-full w-full flex flex-col items-center justify-center">
-                    <Image
-                      width={100}
-                      height={100}
-                      alt="lost"
-                      src={card.image}
-                    />
-
+                    {card.image && (
+                      <Image
+                        width={100}
+                        height={100}
+                        alt="icon representing the card"
+                        src={card.image}
+                      />
+                    )}
                     <p className="font-medium p-3 text-zinc-300">
                       {capitalize(card.translation)}
                     </p>
@@ -172,12 +159,22 @@ export default function Learn() {
             </div>
           </div>
         ))}
+        {!useCardsStore.length && (
+          <p className="m-8 font-medium">
+            🎉 Congratulations! You have finished this deck for now.
+          </p>
+        )}
       </div>
 
       <div className="absolute right-0 bottom-0 m-4">
         <div className="h-11 w-11">
           <Link href="/main/card">
-            <khk-button variant="outline" full shape="circular">
+            <khk-button
+              variant="outline"
+              full
+              shape="circular"
+              class="flex h-full w-full"
+            >
               <Plus />
             </khk-button>
           </Link>

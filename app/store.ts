@@ -1,18 +1,23 @@
-import { AnkiConnectService } from "./services/anki-connect.service";
-import { TranslateService } from "./services/translate.service";
+import { create } from "zustand";
 
-export interface IStore {
-  japVoices: SpeechSynthesisVoice[];
-  services: {
-    ankiConnect: AnkiConnectService;
-    translate: TranslateService;
-  };
+export interface Card {
+  id: number;
+  image: string;
+  kana: string;
+  kanji: string;
+  translation: string;
 }
 
-export const Store: IStore = {
-  japVoices: [],
-  services: {
-    ankiConnect: new AnkiConnectService(),
-    translate: new TranslateService(),
-  },
+interface IStore {
+  cards: Card[];
+  setCards: (cards: Card[]) => void;
+}
+
+export const Store = create<IStore>((set) => ({
+  cards: [],
+  setCards: (cards: Card[]) => set({ cards }),
+}));
+
+export const useStore = (): [Card[], (cards: Card[]) => void] => {
+  return [Store((state) => state.cards), Store((state) => state.setCards)];
 };

@@ -2,28 +2,43 @@
 
 import "@add-le/ankihon-kohaku";
 import { useEffect } from "react";
-import { getAnkihonDeck, getAnkihonModel } from "./lib/anki";
+import {
+  getAnkihonCardsInfos,
+  getAnkihonCardsNeedLearn,
+  getAnkihonDeck,
+  getAnkihonModel,
+  getAnkihonNotesInfos,
+} from "./lib/anki";
+import { toCard } from "./lib/card";
 import { getSpeech } from "./lib/speech";
+import { Share } from "./share";
 import { Store } from "./store";
 
 export default function Init() {
+  const setCardsStore = Store((state) => state.setCards);
+
   useEffect(() => {
     async function init() {
-      // Fetch the ankihon deck from anki
-      const ankihonDeckId = await getAnkihonDeck();
-      console.log("logger ankihonDeckId", ankihonDeckId);
-      // Fetch the ankihon model from anki
-      const ankihonModelId = await getAnkihonModel();
-      console.log("logger ankihonModelId", ankihonModelId);
+      // Create the ankihon deck if it doesn't exist
+      await getAnkihonDeck();
+      // Create the ankihon model if it doesn't exist
+      await getAnkihonModel();
+      // Get the cards that need to be learned
+      const cardsIdsNeedLearn = await getAnkihonCardsNeedLearn();
+      // Get the cards infos
+      const notes = await getAnkihonNotesInfos(cardsIdsNeedLearn);
+      const cards = await getAnkihonCardsInfos(
+        notes.map((note) => note.cards[0])
+      );
+      setCardsStore(toCard(cards));
 
       const voices = await getSpeech();
       const japVoices = voices.filter((voice) => voice.lang === "ja-JP");
-      console.log("logger", japVoices);
-      Store.japVoices = japVoices;
+      Share.japVoices = japVoices;
     }
 
     init();
-  }, []);
+  });
 
   return null;
 }

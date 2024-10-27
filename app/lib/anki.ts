@@ -1,21 +1,21 @@
 import type { TranslationResult } from "google-translate-api-browser/dest/types/TranslationResult";
 import { toHiragana } from "wanakana";
-import { Store } from "../store";
+import { Share } from "../share";
 
 const ankihonDeckName = "Ankihon: Master Japanese, One Flashcard at a Time!";
 const ankihonModelName = "Ankihon";
 
 export async function isAnkihonDeckPresent(): Promise<boolean> {
-  const response = await Store.services.ankiConnect.deckNames();
+  const response = await Share.services.ankiConnect.deckNames();
   return response.includes(ankihonDeckName);
 }
 
 export async function createAnkihonDeck(): Promise<number> {
-  return await Store.services.ankiConnect.createDeck(ankihonDeckName);
+  return await Share.services.ankiConnect.createDeck(ankihonDeckName);
 }
 
 export async function getAnkihonDeck(): Promise<number> {
-  const response = await Store.services.ankiConnect.deckNamesAndIds();
+  const response = await Share.services.ankiConnect.deckNamesAndIds();
 
   if (ankihonDeckName in response) {
     return response[ankihonDeckName];
@@ -25,13 +25,13 @@ export async function getAnkihonDeck(): Promise<number> {
 }
 
 export async function isAnkihonModelPresent(): Promise<boolean> {
-  const response = await Store.services.ankiConnect.modelNames();
+  const response = await Share.services.ankiConnect.modelNames();
   return response.includes(ankihonModelName);
 }
 
 export async function createAnkihonModel(): Promise<number> {
   return (
-    await Store.services.ankiConnect.createModel({
+    await Share.services.ankiConnect.createModel({
       modelName: ankihonModelName,
       inOrderFields: ["Translation", "Kanji", "Kana"],
       css: 'body,html{height:100%}.card{height:95%;display:flex;align-items:center;justify-content:center;font-family:arial;font-size:20px;text-align:center;color:#000;background-color:#fff}.translation_front{font-family:"Arial";font-size:24px;color:#fafafa;font-weight:700}.kana_back,.kanji_back,.translation_back{font-family:"Arial";font-size:16px;color:#d4d4d8;font-weight:700}.kana_back,.kanji_back{font-size:36px;color:#fafafa}.kana_back{font-size:14px;color:#a1a1a1}',
@@ -48,7 +48,7 @@ export async function createAnkihonModel(): Promise<number> {
 }
 
 export async function getAnkihonModel(): Promise<number> {
-  const response = await Store.services.ankiConnect.modelNamesAndIds();
+  const response = await Share.services.ankiConnect.modelNamesAndIds();
 
   if (ankihonModelName in response) {
     return response[ankihonModelName];
@@ -66,7 +66,7 @@ export async function createNote(
   back: string,
   params?: CreateNoteAnkihonParams
 ): Promise<number> {
-  return await Store.services.ankiConnect.addNote({
+  return await Share.services.ankiConnect.addNote({
     deckName: ankihonDeckName,
     modelName: ankihonModelName,
     fields: {
@@ -90,4 +90,50 @@ export async function createNote(
       video: [],
     },
   });
+}
+
+export async function getAnkihonCardsDue() {
+  const cards = await Share.services.ankiConnect.cardReviews({
+    deck: ankihonDeckName,
+    startID: 0,
+  });
+
+  if (!cards?.length) {
+    return;
+  }
+
+  const formattedCards = [];
+  for (const card of cards) {
+    formattedCards.push(
+      card.map((value, index) => (index === 0 ? new Date(value) : value))
+    );
+  }
+
+  return formattedCards;
+}
+
+export async function getAnkihonCardsInfos(cardsIds: number[]) {
+  return await Share.services.ankiConnect.cardsInfo(cardsIds);
+}
+
+export async function getAnkihonCardsNeedLearn() {
+  return await Share.services.ankiConnect.findNotes(
+    `deck:"${ankihonDeckName}" is:learn`
+  );
+}
+
+export async function getAnkihonNotesInfos(notesIds: number[]) {
+  return await Share.services.ankiConnect.notesInfo(notesIds);
+}
+
+export async function answerAnkihonCard(
+  cardId: number,
+  success: "good" | "again"
+) {
+  return await Share.services.ankiConnect.answerCards([
+    {
+      cardId,
+      ease: success === "again" ? 1 : 3,
+    },
+  ]);
 }
