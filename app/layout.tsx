@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
-import nextConfig from "../next.config.mjs";
 import "./globals.css";
 import Init from "./init";
+const {
+  default: { basePath },
+} = await import("../next.config.mjs");
 
 export const metadata: Metadata = {
-  manifest: `${nextConfig.basePath}/manifest.webmanifest`,
+  manifest: `${basePath}/manifest.webmanifest`,
 };
 
 export default function RootLayout({
