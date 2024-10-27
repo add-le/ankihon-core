@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk_N_E=self.webpackChunk_N_E||[]).push([[119,539],{119:function(e,s,t){t.d(s,{S:function(){return h}});var u=t(226);let h=(e,s)=>(0,u.h)(u.H,{...e},(0,u.h)("link",{rel:"stylesheet",type:"text/css",href:"/build/kohaku.css"}),s)}}]);
