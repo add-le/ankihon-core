@@ -1,10 +1,9 @@
-import type { Metadata } from "next";
+import Head from "next/head";
 import "./globals.css";
 import Init from "./init";
-
-export const metadata: Metadata = {
-  manifest: `/ankihon-core/manifest.webmanifest`,
-};
+const {
+  default: { basePath },
+} = await import("../next.config.mjs");
 
 export default function RootLayout({
   children,
@@ -14,6 +13,9 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <Init />
+      <Head>
+        <link rel="manifest" href={`${basePath}/manifest.webmanifest`} />
+      </Head>
       <body>{children}</body>
     </html>
   );
