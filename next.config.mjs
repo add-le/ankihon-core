@@ -4,7 +4,7 @@ const __dirname = path.resolve();
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  basePath: "/ankihon-core",
+  basePath: process.env.NODE_ENV === "development" ? "" : "/ankihon-core",
   output: "export",
   distDir: "docs",
   images: {
