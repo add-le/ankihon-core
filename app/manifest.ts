@@ -20,7 +20,7 @@ export default function manifest(): MetadataRoute.Manifest {
       },
     ],
     id: "/?source=pwa",
-    start_url: `${basePath}/toto/tata`,
+    start_url: `${basePath}/main/learn`,
     background_color: "#E3DED2",
     display: "standalone",
     scope: "/",
