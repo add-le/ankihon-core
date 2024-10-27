@@ -5,6 +5,7 @@ const __dirname = path.resolve();
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: "export",
+  distDir: "docs",
   images: {
     unoptimized: true,
   },
