@@ -10,7 +10,7 @@
     "lint": "next lint"
   },
   "devDependencies": {
-    "@add-le/ankihon-kohaku": "0.0.25",
+    "@add-le/ankihon-kohaku": "0.0.26",
     "@stencil/core": "4.22.1",
     "@types/node": "20",
     "@types/react": "18.3.1",

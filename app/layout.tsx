@@ -13,7 +13,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <Init />
       <head>
-        <base href={basePath} />
+        <base href={`${basePath}/`} />
         <link
           rel="manifest"
           href={`${basePath}/manifest.webmanifest`}
