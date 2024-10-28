@@ -6,7 +6,6 @@ const __dirname = path.resolve();
 const nextConfig = {
   basePath: process.env.NODE_ENV === "development" ? "" : "/ankihon-core",
   output: "export",
-  distDir: "docs",
   images: {
     unoptimized: true,
   },

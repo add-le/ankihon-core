@@ -9,6 +9,7 @@ type Actions =
   | "createModel"
   | "deckNames"
   | "deckNamesAndIds"
+  | "findCards"
   | "findNotes"
   | "getReviewsOfCards"
   | "modelNames"
@@ -182,6 +183,9 @@ type AnswerCardsParams = {
 }[];
 type AnswerCardsResponse = boolean[];
 
+type FindCardsParams = string;
+type FindCardsResponse = number[];
+
 export class AnkiConnectService extends Service {
   public constructor() {
     super();
@@ -337,5 +341,14 @@ export class AnkiConnectService extends Service {
     params: AnswerCardsParams
   ): Promise<AnswerCardsResponse> {
     return this.invoke<AnswerCardsResponse>("answerCards", { answers: params });
+  }
+
+  /**
+   * Find cards in the Anki collection that match a query.
+   * @param {FindCardsParams} query The query to match.
+   * @returns {Promise<FindCardsResponse>} A list of card IDs.
+   */
+  public async findCards(query: FindCardsParams): Promise<FindCardsResponse> {
+    return this.invoke<FindCardsResponse>("findCards", { query });
   }
 }
