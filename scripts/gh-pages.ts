@@ -1,5 +1,18 @@
+import chalk from "chalk";
 import ghpages from "gh-pages";
 
-ghpages.publish("out", {
-  nojekyll: true,
-});
+const EXIT_SUCCESS = 0;
+const EXIT_FAILURE = 1;
+
+try {
+  ghpages.publish("out", {
+    message: "Deployed to GitHub Pages",
+    nojekyll: true,
+  });
+
+  console.log(`${chalk.green("✓")} Successfully deployed to GitHub Pages`);
+  process.exit(EXIT_SUCCESS);
+} catch (error) {
+  console.error(`${chalk.red("✗")} Error deploying to GitHub Pages:`, error);
+  process.exit(EXIT_FAILURE);
+}
