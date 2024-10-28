@@ -9,7 +9,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { capitalize } from "radash";
 import { useRef, useState } from "react";
-import "./styles.css";
 
 export default function Learn() {
   const [useCardsStore, setCardsStore] = useStore();
@@ -85,9 +84,11 @@ export default function Learn() {
       <div className="flex justify-center h-full items-center relative">
         {useCardsStore.map((card, index) => (
           <div
-            className={`card ${
-              index === useCardsStore.length - 1 ? "active" : ""
-            } h-[75%]`}
+            className={`absolute w-72 max-w-[85dvw] h-[75%] bg-cover bg-center rounded-3xl shadow-2xl flex justify-center items-end text-zinc-50 text-2xl transition-transform ease-in-out duration-300 card ${
+              index === useCardsStore.length - 1
+                ? "z-50"
+                : "scale-75 opacity-70"
+            }`}
             key={card.translation}
             onTouchStart={handleTouchStart}
             onTouchMove={handleTouchMove}
