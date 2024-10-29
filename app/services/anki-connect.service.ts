@@ -200,6 +200,9 @@ export class AnkiConnectService extends Service {
     const { result, error } = await this.fetch<AnkiResponse<T>>(
       "http://localhost:8765",
       {
+        headers: {
+          "Content-Type": "application/json",
+        },
         method: "POST",
         body: JSON.stringify({ action, params, key, version }),
       }
