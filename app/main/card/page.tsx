@@ -130,7 +130,7 @@ export default function Card() {
         <Image
           width={100}
           height={100}
-          src="/images/cards/placeholder.png"
+          src="images/cards/placeholder.png"
           title="Designed by Freepik"
           alt="placeholder"
           priority

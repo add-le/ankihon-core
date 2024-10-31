@@ -11,7 +11,7 @@ export async function isAnkihonDeckPresent(): Promise<boolean> {
 }
 
 export async function createAnkihonDeck(): Promise<number> {
-  return await Share.services.ankiConnect.createDeck(ankihonDeckName);
+  return Share.services.ankiConnect.createDeck(ankihonDeckName);
 }
 
 export async function getAnkihonDeck(): Promise<number> {
@@ -21,7 +21,7 @@ export async function getAnkihonDeck(): Promise<number> {
     return response[ankihonDeckName];
   }
 
-  return await createAnkihonDeck();
+  return createAnkihonDeck();
 }
 
 export async function isAnkihonModelPresent(): Promise<boolean> {
@@ -54,7 +54,7 @@ export async function getAnkihonModel(): Promise<number> {
     return response[ankihonModelName];
   }
 
-  return await createAnkihonModel();
+  return createAnkihonModel();
 }
 
 type CreateNoteAnkihonParams = {
@@ -66,7 +66,7 @@ export async function createNote(
   back: string,
   params?: CreateNoteAnkihonParams
 ): Promise<number> {
-  return await Share.services.ankiConnect.addNote({
+  return Share.services.ankiConnect.addNote({
     deckName: ankihonDeckName,
     modelName: ankihonModelName,
     fields: {
@@ -113,24 +113,30 @@ export async function getAnkihonCardsDue() {
 }
 
 export async function getAnkihonCardsInfos(cardsIds: number[]) {
-  return await Share.services.ankiConnect.cardsInfo(cardsIds);
+  return Share.services.ankiConnect.cardsInfo(cardsIds);
+}
+
+export async function getAnkihonNotesNeedLearn() {
+  return Share.services.ankiConnect.findNotes(
+    `deck:"${ankihonDeckName}" is:learn`
+  );
 }
 
 export async function getAnkihonCardsNeedLearn() {
-  return await Share.services.ankiConnect.findNotes(
+  return Share.services.ankiConnect.findCards(
     `deck:"${ankihonDeckName}" is:learn`
   );
 }
 
 export async function getAnkihonNotesInfos(notesIds: number[]) {
-  return await Share.services.ankiConnect.notesInfo(notesIds);
+  return Share.services.ankiConnect.notesInfo(notesIds);
 }
 
 export async function answerAnkihonCard(
   cardId: number,
   success: "good" | "again"
 ) {
-  return await Share.services.ankiConnect.answerCards([
+  return Share.services.ankiConnect.answerCards([
     {
       cardId,
       ease: success === "again" ? 1 : 3,

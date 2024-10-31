@@ -1,10 +1,8 @@
-import type { Metadata } from "next";
 import "./globals.css";
 import Init from "./init";
-
-export const metadata: Metadata = {
-  manifest: "/manifest.json",
-};
+const {
+  default: { basePath },
+} = await import("../next.config.mjs");
 
 export default function RootLayout({
   children,
@@ -14,6 +12,14 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <Init />
+      <head>
+        <base href={`${basePath}/`} />
+        <link
+          rel="manifest"
+          href={`${basePath}/manifest.webmanifest`}
+          crossOrigin="use-credentials"
+        />
+      </head>
       <body>{children}</body>
     </html>
   );

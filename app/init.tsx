@@ -7,7 +7,6 @@ import {
   getAnkihonCardsNeedLearn,
   getAnkihonDeck,
   getAnkihonModel,
-  getAnkihonNotesInfos,
 } from "./lib/anki";
 import { toCard } from "./lib/card";
 import { getSpeech } from "./lib/speech";
@@ -26,10 +25,7 @@ export default function Init() {
       // Get the cards that need to be learned
       const cardsIdsNeedLearn = await getAnkihonCardsNeedLearn();
       // Get the cards infos
-      const notes = await getAnkihonNotesInfos(cardsIdsNeedLearn);
-      const cards = await getAnkihonCardsInfos(
-        notes.map((note) => note.cards[0])
-      );
+      const cards = await getAnkihonCardsInfos(cardsIdsNeedLearn);
       setCardsStore(toCard(cards));
 
       const voices = await getSpeech();
