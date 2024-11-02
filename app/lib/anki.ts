@@ -128,6 +128,10 @@ export async function getAnkihonCardsNeedLearn() {
   );
 }
 
+export async function getAnkihonCards() {
+  return Share.services.ankiConnect.findCards(`deck:"${ankihonDeckName}"`);
+}
+
 export async function getAnkihonNotesInfos(notesIds: number[]) {
   return Share.services.ankiConnect.notesInfo(notesIds);
 }

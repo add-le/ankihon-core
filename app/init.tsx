@@ -3,8 +3,8 @@
 import "@add-le/ankihon-kohaku";
 import { useEffect } from "react";
 import {
+  getAnkihonCards,
   getAnkihonCardsInfos,
-  getAnkihonCardsNeedLearn,
   getAnkihonDeck,
   getAnkihonModel,
 } from "./lib/anki";
@@ -22,10 +22,10 @@ export default function Init() {
       await getAnkihonDeck();
       // Create the ankihon model if it doesn't exist
       await getAnkihonModel();
-      // Get the cards that need to be learned
-      const cardsIdsNeedLearn = await getAnkihonCardsNeedLearn();
+      // Get the cards that need to be displayed
+      const cardsIds = await getAnkihonCards();
       // Get the cards infos
-      const cards = await getAnkihonCardsInfos(cardsIdsNeedLearn);
+      const cards = await getAnkihonCardsInfos(cardsIds);
       setCardsStore(toCard(cards));
 
       const voices = await getSpeech();
