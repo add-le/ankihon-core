@@ -20,7 +20,7 @@ export class TranslateService extends Service {
     return await translate(text, {
       from: toJapanese ? "en" : "ja",
       to: toJapanese ? "ja" : "en",
-      corsUrl: "http://cors-anywhere.herokuapp.com/",
+      corsUrl: "https://corsproxy.io/?",
     });
   }
 }
